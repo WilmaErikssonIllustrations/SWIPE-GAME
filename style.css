@@ -237,3 +237,42 @@ body {
 .action-btn:active {
   transform: scale(0.93);
 }
+
+/* 1. Tar bort den blå/grå klick-rutan på mobil/touch-skärmar */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 2. Förhindra att text blir markerad/blå när man klickar eller drar flera gånger */
+button,
+.pet-card,
+.action-btn,
+.swipe-card,
+.swipe-text,
+.handwritten-title,
+.start-title {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+@media (min-width: 768px) {
+  .swipe-container {
+    height: auto;
+    width: auto;
+    max-width: 520px;
+    padding: 40px 32px;
+    background-color: #efe7dc; /* Varm nyans som matchar var(--cream-bg) */
+    border-radius: 24px;
+    border: 2px solid var(--lighter-2);
+    box-shadow: 0 8px 24px rgba(44, 43, 44, 0.08);
+  }
+}
+
+@media (min-width: 1024px) {
+  .swipe-container {
+    max-width: 560px;
+    padding: 48px 40px;
+    border-radius: 28px;
+    box-shadow: 0 12px 32px rgba(44, 43, 44, 0.1);
+  }
+}
