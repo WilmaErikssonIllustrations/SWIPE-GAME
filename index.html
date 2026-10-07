@@ -15,9 +15,84 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <main class="start-container">
+    <!-- Startvy -->
+    <main class="start-container" id="start-view">
       <h1 class="start-title">Vilken typ av djurvän är du?</h1>
-      <button class="play-btn">SPELA</button>
+      <button class="play-btn" id="play-btn">SPELA</button>
+    </main>
+
+    <!-- Djurväljarvy -->
+    <main class="select-container hidden" id="select-view">
+      <h2 class="handwritten-title">välj ditt husdjur</h2>
+
+      <div class="pet-options">
+        <button class="pet-card" data-pet="katt">
+          <div class="image-wrapper">
+            <img src="assets/cat2.jpg" alt="Katt" />
+          </div>
+          <span class="pet-label">katt</span>
+        </button>
+
+        <button class="pet-card" data-pet="hund">
+          <div class="image-wrapper">
+            <img src="assets/dog.jpg" alt="Hund" />
+          </div>
+          <span class="pet-label">hund</span>
+        </button>
+      </div>
+    </main>
+
+    <!-- Swipe-vy (Hund) -->
+    <main class="swipe-container hidden" id="swipe-view">
+      <div class="swipe-card">
+        <img id="card-img" src="assets/running.jpg" alt="Hundillustration" />
+      </div>
+
+      <p class="swipe-text" id="swipe-text">
+        jag älskar att ta hunden med på träningspasset
+      </p>
+
+      <div class="action-buttons">
+        <button class="action-btn undo-btn" id="undo-btn" aria-label="Ångra">
+          <svg
+            viewBox="0 0 24 24"
+            width="28"
+            height="28"
+            stroke="currentColor"
+            stroke-width="2.5"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+          </svg>
+        </button>
+
+        <button class="action-btn reject-btn" id="reject-btn" aria-label="Nej">
+          <svg
+            viewBox="0 0 24 24"
+            width="28"
+            height="28"
+            stroke="#ff5252"
+            stroke-width="3"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <button class="action-btn like-btn" id="like-btn" aria-label="Ja">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="#ff4b6e">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+            />
+          </svg>
+        </button>
+      </div>
     </main>
 
     <script src="main.js"></script>

@@ -13,6 +13,14 @@
   padding: 0;
 }
 
+/* Förhindra att hela sidan någonsin kan skrolla horisontellt */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   background-color: var(--cream-bg);
   font-family: "DM Sans", sans-serif;
@@ -21,6 +29,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  min-height: 100dvh; /* Anpassar sig efter mobilens adressfält */
   overflow: hidden;
 }
 
@@ -29,12 +38,14 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 20px;
+  width: 100%;
 }
 
 .start-title {
-  width: 331px;
-  height: 88px;
-  font-family: "Figma Hand", "Caveat", cursive, sans-serif;
+  max-width: 331px;
+  width: 100%;
+  font-family: "Caveat", cursive, sans-serif;
   font-size: 32px;
   font-weight: 400;
   color: var(--main);
@@ -55,8 +66,6 @@ body {
   font-weight: 700;
   font-size: 16px;
   line-height: 1.5;
-  letter-spacing: 0%;
-  text-align: center;
   border: none;
   border-radius: 7px;
   cursor: pointer;
@@ -74,4 +83,157 @@ body {
 
 .play-btn:active {
   transform: scale(0.97);
+}
+
+/* --- NYA STILAR FÖR DJURVÄLJARVYN --- */
+
+.hidden {
+  display: none !important;
+}
+
+.select-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  width: 100%;
+  padding: 20px;
+}
+
+.handwritten-title {
+  font-family: "Caveat", cursive, sans-serif;
+  font-size: 44px;
+  font-weight: 500;
+  color: var(--main);
+  text-align: center;
+}
+
+.pet-options {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+}
+
+.pet-card {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  outline: none;
+  transition: transform 0.2s ease;
+}
+
+.pet-card:hover {
+  transform: translateY(-4px);
+}
+
+.pet-card:active {
+  transform: scale(0.96);
+}
+
+/* Anpassade mått på cirklarna för mobilen */
+.image-wrapper {
+  width: 135px;
+  height: 135px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pet-label {
+  font-family: "Caveat", cursive, sans-serif;
+  font-size: 38px;
+  color: var(--main);
+}
+
+/* --- SWIPE-VY --- */
+
+.swipe-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%; /* Ändrat från 100vw till 100% för att slippa sidoscroll */
+  max-width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  padding: 16px;
+  touch-action: none;
+}
+
+/* Det gröna kortet anpassar sig nu efter mindre skärmar */
+.swipe-card {
+  width: min(320px, 80vw);
+  height: min(320px, 80vw);
+  background-color: #557850;
+  border: 3px solid var(--main);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.swipe-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.swipe-text {
+  font-family: "Caveat", cursive, sans-serif;
+  font-size: 28px;
+  color: var(--main);
+  text-align: center;
+  line-height: 1.15;
+  margin-top: 24px;
+  margin-bottom: 28px;
+  max-width: 280px;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.action-btn {
+  width: 60px;
+  height: 60px;
+  background-color: var(--main);
+  color: var(--white);
+  border: none;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    transform 0.1s ease,
+    background-color 0.2s ease;
+}
+
+.action-btn:hover {
+  background-color: var(--hover);
+}
+
+.action-btn:active {
+  transform: scale(0.93);
 }
