@@ -71,22 +71,25 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // --- KONTROLLERA OM SKÄRMEN STÖDER TOUCH ---
-  const isTouchDevice = () => {
-    return (
+  // --- KONTROLLERA OM SWIPE SKA TILLÅTAS (ENDAST MOBIL & TABLET, DVS UNDER 1024px) ---
+  const isSwipeAllowed = () => {
+    const isTouch =
       "ontouchstart" in window ||
       navigator.maxTouchPoints > 0 ||
-      window.matchMedia("(pointer: coarse)").matches
-    );
+      window.matchMedia("(pointer: coarse)").matches;
+
+    const isSmallerThanLaptop = window.innerWidth < 1024;
+
+    return isTouch && isSmallerThanLaptop;
   };
 
-  // --- SWIPE (MOBIL) ---
+  // --- SWIPE (MOBIL OCH TABLET) ---
   let startX = 0;
   let currentX = 0;
   let isDragging = false;
 
   swipeView.addEventListener("touchstart", (e) => {
-    if (!isTouchDevice()) return;
+    if (!isSwipeAllowed()) return;
     if (e.target.closest(".action-btn")) return;
 
     isDragging = true;
@@ -95,14 +98,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   window.addEventListener("touchmove", (e) => {
-    if (!isDragging || !isTouchDevice()) return;
+    if (!isDragging || !isSwipeAllowed()) return;
     currentX = e.touches[0].clientX - startX;
     const rotate = currentX * 0.1;
     swipeCard.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
   });
 
   window.addEventListener("touchend", () => {
-    if (!isDragging || !isTouchDevice()) return;
+    if (!isDragging || !isSwipeAllowed()) return;
     isDragging = false;
 
     swipeCard.style.transition = "transform 0.3s ease";
@@ -120,13 +123,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Går till nästa kort
   function nextCard(delay = 0) {
-    setTimeout(() => {
+    if (delay === 0) {
       currentCardIndex++;
       swipeCard.style.transition = "none";
       swipeCard.style.transform = "translateX(0px) rotate(0deg)";
       currentX = 0;
       updateCardContent();
-    }, delay);
+    } else {
+      setTimeout(() => {
+        currentCardIndex++;
+        swipeCard.style.transition = "none";
+        swipeCard.style.transform = "translateX(0px) rotate(0deg)";
+        currentX = 0;
+        updateCardContent();
+      }, delay);
+    }
   }
 
   // --- KNAPPHÄNDELSER ---
@@ -145,21 +156,23 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   rejectBtn?.addEventListener("click", () => {
-    if (isTouchDevice()) {
+    if (isSwipeAllowed()) {
       swipeCard.style.transition = "transform 0.3s ease";
       swipeCard.style.transform = "translateX(-1000px) rotate(-30deg)";
       nextCard(300);
     } else {
+      // Laptop: Byt kort direkt utan någonsin att använda transform/animering
       nextCard(0);
     }
   });
 
   likeBtn?.addEventListener("click", () => {
-    if (isTouchDevice()) {
+    if (isSwipeAllowed()) {
       swipeCard.style.transition = "transform 0.3s ease";
       swipeCard.style.transform = "translateX(1000px) rotate(30deg)";
       nextCard(300);
     } else {
+      // Laptop: Byt kort direkt utan någonsin att använda transform/animering
       nextCard(0);
     }
   });
