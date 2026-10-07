@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
       text: "jag älskar att ta hunden med på träningspasset",
     },
     {
-      img: "assets/running.jpg",
+      img: "assets/eco-food.jpg",
       text: "ekologisk mat är viktigt för både mig och min hund",
     },
   ];
@@ -20,11 +20,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- KORT FÖR KATT ---
   const catCards = [
     {
-      img: "assets/cat2.jpg",
+      img: "assets/cozy.jpg",
       text: "jag föredrar lugna kvällar i soffan med min katt",
     },
     {
-      img: "assets/cat2.jpg",
+      img: "assets/eco-food.jpg",
       text: "ekologisk mat är viktigt för både mig och min katt",
     },
   ];
@@ -88,9 +88,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentX = 0;
   let isDragging = false;
 
-  swipeView.addEventListener("touchstart", (e) => {
+  // Lyssna direkt på kortet istället för hela swipeView
+  swipeCard.addEventListener("touchstart", (e) => {
     if (!isSwipeAllowed()) return;
-    if (e.target.closest(".action-btn")) return;
 
     isDragging = true;
     startX = e.touches[0].clientX;
@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
       swipeCard.style.transform = "translateX(-1000px) rotate(-30deg)";
       nextCard(300);
     } else {
-      // Laptop: Byt kort direkt utan någonsin att använda transform/animering
+      // Laptop: Byt kort direkt utan animering
       nextCard(0);
     }
   });
@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
       swipeCard.style.transform = "translateX(1000px) rotate(30deg)";
       nextCard(300);
     } else {
-      // Laptop: Byt kort direkt utan någonsin att använda transform/animering
+      // Laptop: Byt kort direkt utan animering
       nextCard(0);
     }
   });
