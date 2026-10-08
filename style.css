@@ -257,6 +257,22 @@ button,
   user-select: none;
 }
 
+/* Mjuk entréanimering för nya kort */
+@keyframes cardEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.swipe-card.animate-in {
+  animation: cardEnter 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
 @media (min-width: 768px) {
   .swipe-container {
     height: auto;

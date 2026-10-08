@@ -161,6 +161,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const cardImg = document.getElementById("card-img");
   const swipeText = document.getElementById("swipe-text");
 
+  function triggerCardAnimation() {
+    swipeCard.classList.remove("animate-in");
+    void swipeCard.offsetWidth; // Triggar omflyttning (reflow) för att starta om animationen
+    swipeCard.classList.add("animate-in");
+  }
+
   // Hjälpfunktion för att blanda en array slumpmässigt
   function shuffleArray(array) {
     return [...array].sort(() => Math.random() - 0.5);
@@ -173,19 +179,26 @@ document.addEventListener("DOMContentLoaded", () => {
     scores.tricks = 0;
   }
 
-  // Förladda alla bilder i minnet
-  function preloadImages(cards) {
-    cards.forEach((card) => {
+  // Förladda ALLA bilder i minnet direkt vid start
+  function preloadAllImages() {
+    const allCards = [...dogCards, ...catCards];
+    const extraImages = ["assets/cat2.jpg", "assets/dog.jpg"];
+
+    [...allCards.map((c) => c.img), ...extraImages].forEach((src) => {
       const img = new Image();
-      img.src = card.img;
+      img.src = src;
     });
   }
+
+  // Kör förladdningen direkt när sidan laddas
+  preloadAllImages();
 
   // Uppdaterar innehållet på kortet eller visar resultatet
   function updateCardContent() {
     if (currentCardIndex < currentCards.length) {
       cardImg.src = currentCards[currentCardIndex].img;
       swipeText.textContent = currentCards[currentCardIndex].text;
+      triggerCardAnimation();
     } else {
       showResult();
     }
@@ -207,6 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     cardImg.style.display = "none";
     swipeText.innerHTML = `<strong>Din profil: ${result.title}</strong><br><br>${result.description}`;
+    triggerCardAnimation();
   }
 
   // Gå från startsida till djurval
@@ -228,7 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       resetScores();
-      preloadImages(currentCards);
+      // (Borttaget: preloadImages, eftersom allt redan är förladdat vid start)
 
       selectView.classList.add("hidden");
       swipeView.classList.remove("hidden");
@@ -260,6 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
     isDragging = true;
     startX = e.touches[0].clientX;
     swipeCard.style.transition = "none";
+    swipeCard.classList.remove("animate-in");
   });
 
   window.addEventListener("touchmove", (e) => {

@@ -13,6 +13,11 @@
     />
 
     <link rel="stylesheet" href="style.css" />
+
+    <!-- Förladda viktiga bilder för direkt visning -->
+    <link rel="preload" as="image" href="assets/running.jpg" />
+    <link rel="preload" as="image" href="assets/cat2.jpg" />
+    <link rel="preload" as="image" href="assets/dog.jpg" />
   </head>
   <body>
     <!-- Startvy -->
@@ -44,7 +49,7 @@
 
     <!-- Swipe-vy -->
     <main class="swipe-container hidden" id="swipe-view">
-      <div class="swipe-card">
+      <div class="swipe-card animate-in">
         <img id="card-img" src="assets/running.jpg" alt="Hundillustration" />
         <p class="swipe-text" id="swipe-text">
           jag älskar att ta hunden med på träningspasset
