@@ -15,9 +15,9 @@
     <link rel="stylesheet" href="style.css" />
 
     <!-- Förladda viktiga bilder för direkt visning -->
-    <link rel="preload" as="image" href="assets/running.jpg" />
-    <link rel="preload" as="image" href="assets/cat2.jpg" />
-    <link rel="preload" as="image" href="assets/dog.jpg" />
+    <link rel="preload" as="image" href="assets/running.webp" />
+    <link rel="preload" as="image" href="assets/cat2.webp" />
+    <link rel="preload" as="image" href="assets/dog.webp" />
   </head>
   <body>
     <!-- Startvy -->
@@ -33,14 +33,14 @@
       <div class="pet-options">
         <button class="pet-card" data-pet="katt">
           <div class="image-wrapper">
-            <img src="assets/cat2.jpg" alt="Katt" />
+            <img src="assets/cat2.webp" alt="Katt" />
           </div>
           <span class="pet-label">katt</span>
         </button>
 
         <button class="pet-card" data-pet="hund">
           <div class="image-wrapper">
-            <img src="assets/dog.jpg" alt="Hund" />
+            <img src="assets/dog.webp" alt="Hund" />
           </div>
           <span class="pet-label">hund</span>
         </button>
@@ -49,14 +49,12 @@
 
     <!-- Swipe-vy -->
     <main class="swipe-container hidden" id="swipe-view">
-      <div class="swipe-card animate-in">
-        <img id="card-img" src="assets/running.jpg" alt="Hundillustration" />
-        <p class="swipe-text" id="swipe-text">
-          jag älskar att ta hunden med på träningspasset
-        </p>
+      <div class="swipe-card animate-in" id="swipe-card">
+        <img id="card-img" src="" alt="Djurillustration" />
+        <p class="swipe-text" id="swipe-text"></p>
       </div>
 
-      <div class="action-buttons">
+      <div class="action-buttons" id="action-buttons">
         <button class="action-btn reject-btn" id="reject-btn" aria-label="Nej">
           <svg
             viewBox="0 0 24 24"

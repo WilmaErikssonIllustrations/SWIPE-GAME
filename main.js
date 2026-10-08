@@ -8,18 +8,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const profiles = {
     active: {
       title: "Äventyraren",
+      img: "assets/bike-.webp",
       description:
         "Du och ditt husdjur lever för rörelse och frisk luft! Oavsett om det handlar om utflykter, löprundor eller upptäcktsfärder är aktivitet och samspel er nyckel till lycka.",
     },
     tricks: {
       title: "TassTränaren",
+      img: "assets/cute.webp",
       description:
         "Du älskar mental stimulans och kommunikation! För dig är det roligaste som finns att utmana djurets hjärna med konster, klicker, pussel och roliga uppgifter.",
     },
     "not active": {
       title: "MysMaxaren",
+      img: "assets/sleep.webp",
       description:
-        "Hemmet är er trygga oas och gosa är er framsta hobby! Lugn och ro, mjuka filtar och kravlösa stunder i soffan är vad du och ditt husdjur värdesätter allra mest.",
+        "Hemmet är er trygga oas och gosa är er främsta hobby! Lugn och ro, mjuka filtar och kravlösa stunder i soffan är vad du och ditt husdjur värdesätter allra mest.",
     },
   };
 
@@ -27,63 +30,63 @@ document.addEventListener("DOMContentLoaded", () => {
   const dogCards = [
     // active
     {
-      img: "assets/running.jpg",
+      img: "assets/running (1).webp",
       text: "jag älskar att ta hunden med på träningspasset",
       category: "active",
     },
     {
-      img: "assets/hunt.jpg",
+      img: "assets/hunt.webp",
       text: "en speciell stund för mig och min hund är när vi jagar tillsammans",
       category: "active",
     },
     {
-      img: "assets/long-walk.jpg",
+      img: "assets/long-walk.webp",
       text: "långa promenader i naturen är min bästa återhämtning",
       category: "active",
     },
     {
-      img: "assets/long-walk.jpg",
+      img: "assets/energetic-dog.webp",
       text: "min hund är en riktig energikick precis som jag",
       category: "active",
     },
 
     // not active
     {
-      img: "assets/dog-blanket.jpg",
+      img: "assets/dog-blanket.webp",
       text: "min hund har nog fler mysiga filtar och gosedjur än de flesta",
       category: "not active",
     },
     {
-      img: "assets/calm-dog.jpg",
+      img: "assets/calm-dog.webp",
       text: "min hunnd påminner mig om hur viktigt det är att unna sig stunder av lugn och ro",
       category: "not active",
     },
     {
-      img: "assets/sofa-dog.jpg",
+      img: "assets/sofa-dog (1).webp",
       text: "att mysa länge i soffan med min hund är bland det bästa jag vet",
       category: "not active",
     },
 
     // tricks
     {
-      img: "assets/agility.jpg",
+      img: "assets/agility.webp",
       text: "jag tränar agility, lydnad eller spår minst en gång i veckan",
       category: "tricks",
     },
     {
-      img: "assets/dog-trick.jpg",
+      img: "assets/dog-trick.webp",
       text: "jag lär gärna min hund nya konster och kluriga trick",
       category: "tricks",
     },
     {
-      img: "assets/dog-puzzle.jpg",
+      img: "assets/dog-puzzle.webp",
       text: "min hund får ofta sin mat i pussel eller aktiveringsleksaker",
       category: "tricks",
     },
 
     //no category extras
     {
-      img: "assets/eco-food.jpg",
+      img: "assets/eco-food.webp",
       text: "ekologisk mat är viktigt för både mig och min hund",
     },
   ];
@@ -92,58 +95,58 @@ document.addEventListener("DOMContentLoaded", () => {
   const catCards = [
     // active
     {
-      img: "assets/outdoor-cat.jpg",
+      img: "assets/outdoor-cat (1).webp",
       text: "min katt älskar att vara ute i naturen precis som jag",
       category: "active",
     },
     {
-      img: "assets/cat-walk.jpg",
+      img: "assets/cat-walk.webp",
       text: "jag går gärna ut med min katt i sele och koppel",
       category: "active",
     },
     {
-      img: "assets/active-cat.jpg",
+      img: "assets/active-cat.webp",
       text: "katter ska vara aktiva och röra på sig ordentligt",
       category: "active",
     },
 
     // not active
     {
-      img: "assets/cozy-cat.jpg",
+      img: "assets/cozy-cat.webp",
       text: "jag föredrar lugna kvällar i soffan med min katt",
       category: "not active",
     },
     {
-      img: "assets/cat-lap.jpg",
+      img: "assets/cat-lap.webp",
       text: "Om det finns en katt i mitt knä så förblir jag",
       category: "not active",
     },
     {
-      img: "assets/inside-cat.jpg",
+      img: "assets/inside-cat.webp",
       text: "min katt är en del av familjen och tryggast inomhus",
       category: "not active",
     },
 
     // tricks
     {
-      img: "assets/smart-cat.jpg",
+      img: "assets/smart-cat (1).webp",
       text: "med en intelligent katt som min är aktivering viktigt",
       category: "tricks",
     },
     {
-      img: "assets/cat-food-toy.jpg",
+      img: "assets/cat-food-toy.webp",
       text: "min katt får ibland lösa foderpussel för att få sina godbitar",
       category: "tricks",
     },
     {
-      img: "assets/high-five-cat.jpg",
+      img: "assets/high-five-cat.webp",
       text: "jag är så stolt över de trick min katt kan göra.",
       category: "tricks",
     },
 
     // no category extras
     {
-      img: "assets/eco-food.jpg",
+      img: "assets/eco-food.webp",
       text: "ekologisk mat är viktigt för både mig och min katt",
     },
   ];
@@ -157,9 +160,10 @@ document.addEventListener("DOMContentLoaded", () => {
     tricks: 0,
   };
 
-  const swipeCard = document.querySelector(".swipe-card");
+  const swipeCard = document.getElementById("swipe-card");
   const cardImg = document.getElementById("card-img");
   const swipeText = document.getElementById("swipe-text");
+  const actionButtons = document.getElementById("action-buttons");
 
   function triggerCardAnimation() {
     swipeCard.classList.remove("animate-in");
@@ -182,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Förladda ALLA bilder i minnet direkt vid start
   function preloadAllImages() {
     const allCards = [...dogCards, ...catCards];
-    const extraImages = ["assets/cat2.jpg", "assets/dog.jpg"];
+    const extraImages = ["assets/cat2.webp", "assets/dog.webp"];
 
     [...allCards.map((c) => c.img), ...extraImages].forEach((src) => {
       const img = new Image();
@@ -196,6 +200,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Uppdaterar innehållet på kortet eller visar resultatet
   function updateCardContent() {
     if (currentCardIndex < currentCards.length) {
+      swipeCard.classList.remove("result-mode");
+      cardImg.style.display = "block";
+      actionButtons.style.display = "flex";
+
       cardImg.src = currentCards[currentCardIndex].img;
       swipeText.textContent = currentCards[currentCardIndex].text;
       triggerCardAnimation();
@@ -204,6 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Räkna ut vilken kategori som fick flest "Ja" och visa resultatet
   // Räkna ut vilken kategori som fick flest "Ja" och visa resultatet
   function showResult() {
     let winningCategory = "not active";
@@ -218,9 +227,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const result = profiles[winningCategory];
 
-    cardImg.style.display = "none";
-    swipeText.innerHTML = `<strong>Din profil: ${result.title}</strong><br><br>${result.description}`;
+    // Visa bilden för den vinnande profilen istället för att dölja den helt!
+    cardImg.style.display = "block";
+    cardImg.src = result.img;
+
+    actionButtons.style.display = "none";
+    swipeCard.classList.add("result-mode");
+
+    // Sätt texten och lägg till en "Spela igen"-knapp direkt i texten eller under
+    swipeText.innerHTML = `
+      <strong>Din profil: ${result.title}</strong><br><br>
+      ${result.description}<br><br>
+      <button id="restart-btn" class="play-btn" style="margin: 12px auto 0 auto; width: 110px; height: 40px; font-size: 14px;">Spela igen</button>
+    `;
+
     triggerCardAnimation();
+
+    // Koppla funktion till starta om-knappen
+    document.getElementById("restart-btn")?.addEventListener("click", () => {
+      swipeCard.classList.remove("result-mode");
+      swipeView.classList.add("hidden");
+      startView.classList.remove("hidden"); // Skickar tillbaka till startvyn
+    });
   }
 
   // Gå från startsida till djurval
@@ -242,12 +270,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       resetScores();
-      // (Borttaget: preloadImages, eftersom allt redan är förladdat vid start)
 
       selectView.classList.add("hidden");
       swipeView.classList.remove("hidden");
       currentCardIndex = 0;
-      cardImg.style.display = "block";
       updateCardContent();
     });
   });
@@ -269,7 +295,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let isDragging = false;
 
   swipeCard.addEventListener("touchstart", (e) => {
-    if (!isSwipeAllowed()) return;
+    if (!isSwipeAllowed() || currentCardIndex >= currentCards.length) return;
 
     isDragging = true;
     startX = e.touches[0].clientX;
@@ -334,7 +360,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Klicka på Hjärta (Ja)
   document.getElementById("like-btn")?.addEventListener("click", () => {
     registerChoice(true);
-    if (isSwipeAllowed()) {
+    // Använd swipe-animation på mobil och tablet (< 1024px), men inte på laptop
+    if (window.innerWidth < 1024) {
       swipeCard.style.transition = "transform 0.3s ease";
       swipeCard.style.transform = "translateX(1000px) rotate(30deg)";
       nextCard(300);
@@ -346,7 +373,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Klicka på Kryss (Nej)
   document.getElementById("reject-btn")?.addEventListener("click", () => {
     registerChoice(false);
-    if (isSwipeAllowed()) {
+    // Använd swipe-animation på mobil och tablet (< 1024px), men inte på laptop
+    if (window.innerWidth < 1024) {
       swipeCard.style.transition = "transform 0.3s ease";
       swipeCard.style.transform = "translateX(-1000px) rotate(-30deg)";
       nextCard(300);
