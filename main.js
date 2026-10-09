@@ -165,7 +165,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const swipeText = document.getElementById("swipe-text");
   const actionButtons = document.getElementById("action-buttons");
   const swipeHint = document.getElementById("swipe-hint");
-
+  const stampLike = document.getElementById("stamp-like");
+  const stampNope = document.getElementById("stamp-nope");
   function triggerCardAnimation() {
     swipeCard.classList.remove("animate-in");
     void swipeCard.offsetWidth; // Triggar omflyttning (reflow) för att starta om animationen
@@ -200,6 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Uppdaterar innehållet på kortet eller visar resultatet
   function updateCardContent() {
+    resetStamps();
     if (currentCardIndex < currentCards.length) {
       swipeCard.classList.remove("result-mode");
       cardImg.style.display = "block";
@@ -229,7 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function showResult() {
     // Dölj swipe-hint om den fortfarande syns av någon anledning
     if (swipeHint) swipeHint.classList.add("hidden");
-
+    resetStamps();
     let winningCategory = "not active";
     let highestScore = -1;
 
@@ -326,6 +328,16 @@ document.addEventListener("DOMContentLoaded", () => {
     currentX = e.touches[0].clientX - startX;
     const rotate = currentX * 0.1;
     swipeCard.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
+    // NYTT: Beräkna hur stark stämpeln (hjärta/kryss) ska synas (0 till 1)
+    const opacity = Math.min(Math.abs(currentX) / 100, 1);
+
+    if (currentX > 0) {
+      if (stampLike) stampLike.style.opacity = opacity;
+      if (stampNope) stampNope.style.opacity = 0;
+    } else {
+      if (stampNope) stampNope.style.opacity = opacity;
+      if (stampLike) stampLike.style.opacity = 0;
+    }
   });
 
   window.addEventListener("touchend", () => {
@@ -336,14 +348,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (currentX > 100) {
       swipeCard.style.transform = "translateX(1000px) rotate(30deg)";
+      if (stampLike) stampLike.style.opacity = 1;
       registerChoice(true);
       nextCard(300);
     } else if (currentX < -100) {
       swipeCard.style.transform = "translateX(-1000px) rotate(-30deg)";
+      if (stampNope) stampNope.style.opacity = 1;
       registerChoice(false);
       nextCard(300);
     } else {
       swipeCard.style.transform = "translateX(0px) rotate(0deg)";
+      resetStamps();
     }
   });
 
@@ -354,6 +369,11 @@ document.addEventListener("DOMContentLoaded", () => {
         scores[currentCategory]++;
       }
     }
+  }
+
+  function resetStamps() {
+    if (stampLike) stampLike.style.opacity = 0;
+    if (stampNope) stampNope.style.opacity = 0;
   }
 
   // Går till nästa kort
