@@ -175,6 +175,7 @@ body {
 
 /* Standardkort */
 .swipe-card {
+  position: relative; /* Behövs för att swipe-hint ska positioneras absolut ovanpå */
   width: min(320px, 85vw);
   height: auto;
   background-color: #efe7dc;
@@ -216,6 +217,43 @@ body {
   margin-top: 16px;
   margin-bottom: 8px;
   max-width: 100%;
+}
+
+/* Swipe-hand emoji animation */
+.swipe-hint {
+  position: absolute;
+  top: 60%; /* Ungefär mitt på bilden */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 32px;
+  z-index: 10;
+  border-radius: 50%;
+  pointer-events: none; /* Ser till att hand-emojin inte stör touch/drag-händelser */
+  text-shadow: 0px 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes swipePrompt {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6) translateX(0);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) translateX(0); /* Tonar in i mitten */
+  }
+  45% {
+    transform: translate(-50%, -50%) scale(1) translateX(60px) rotate(15deg); /* Åker åt höger */
+  }
+  80% {
+    transform: translate(-50%, -50%) scale(1) translateX(-60px) rotate(-15deg); /* Åker åt vänster och stannar där */
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    /* Tonar ut och krymper lite medan den fortfarande är kvar på vänster sida */
+    transform: translate(-50%, -50%) scale(0.6) translateX(-60px) rotate(-15deg);
+    visibility: hidden;
+  }
 }
 
 .action-buttons {

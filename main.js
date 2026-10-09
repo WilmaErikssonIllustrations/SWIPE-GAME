@@ -164,6 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const cardImg = document.getElementById("card-img");
   const swipeText = document.getElementById("swipe-text");
   const actionButtons = document.getElementById("action-buttons");
+  const swipeHint = document.getElementById("swipe-hint");
 
   function triggerCardAnimation() {
     swipeCard.classList.remove("animate-in");
@@ -206,6 +207,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
       cardImg.src = currentCards[currentCardIndex].img;
       swipeText.textContent = currentCards[currentCardIndex].text;
+
+      // Visa hand-emojin (swipe hint) endast på allra första kortet
+      if (currentCardIndex === 0 && swipeHint) {
+        swipeHint.classList.remove("hidden");
+        // Starta om animationen ifall spelet startats om
+        swipeHint.style.animation = "none";
+        void swipeHint.offsetWidth; // trigga reflow
+        swipeHint.style.animation = "swipePrompt 3.0s ease-in-out forwards";
+      } else if (swipeHint) {
+        swipeHint.classList.add("hidden");
+      }
+
       triggerCardAnimation();
     } else {
       showResult();
@@ -213,8 +226,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Räkna ut vilken kategori som fick flest "Ja" och visa resultatet
-  // Räkna ut vilken kategori som fick flest "Ja" och visa resultatet
   function showResult() {
+    // Dölj swipe-hint om den fortfarande syns av någon anledning
+    if (swipeHint) swipeHint.classList.add("hidden");
+
     let winningCategory = "not active";
     let highestScore = -1;
 
@@ -297,6 +312,9 @@ document.addEventListener("DOMContentLoaded", () => {
   swipeCard.addEventListener("touchstart", (e) => {
     if (!isSwipeAllowed() || currentCardIndex >= currentCards.length) return;
 
+    // Om användaren rör kortet, avbryt hinthanden direkt
+    if (swipeHint) swipeHint.classList.add("hidden");
+
     isDragging = true;
     startX = e.touches[0].clientX;
     swipeCard.style.transition = "none";
@@ -359,6 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Klicka på Hjärta (Ja)
   document.getElementById("like-btn")?.addEventListener("click", () => {
+    if (swipeHint) swipeHint.classList.add("hidden");
     registerChoice(true);
     // Använd swipe-animation på mobil och tablet (< 1024px), men inte på laptop
     if (window.innerWidth < 1024) {
@@ -372,6 +391,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Klicka på Kryss (Nej)
   document.getElementById("reject-btn")?.addEventListener("click", () => {
+    if (swipeHint) swipeHint.classList.add("hidden");
     registerChoice(false);
     // Använd swipe-animation på mobil och tablet (< 1024px), men inte på laptop
     if (window.innerWidth < 1024) {
