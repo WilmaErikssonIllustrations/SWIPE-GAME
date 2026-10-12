@@ -399,10 +399,22 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("like-btn")?.addEventListener("click", () => {
     if (swipeHint) swipeHint.classList.add("hidden");
     registerChoice(true);
-    // Använd swipe-animation på mobil och tablet (< 1024px), men inte på laptop
+
     if (window.innerWidth < 1024) {
+      // 1. Ta bort CSS-animationen
+      swipeCard.classList.remove("animate-in");
+
+      // 2. Sätt kortet stelt i mitten (detta blir startpunkten för att flyga iväg)
+      swipeCard.style.transition = "none";
+      swipeCard.style.transform = "translateX(0px) rotate(0deg)";
+
+      // 3. TVINGA webbläsaren att registrera startpunkten (viktigt hack!)
+      void swipeCard.offsetWidth;
+
+      // 4. Nu kan vi be den flyga iväg med en mjuk övergång
       swipeCard.style.transition = "transform 0.3s ease";
       swipeCard.style.transform = "translateX(1000px) rotate(30deg)";
+
       nextCard(300);
     } else {
       nextCard(0);
@@ -413,10 +425,22 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("reject-btn")?.addEventListener("click", () => {
     if (swipeHint) swipeHint.classList.add("hidden");
     registerChoice(false);
-    // Använd swipe-animation på mobil och tablet (< 1024px), men inte på laptop
+
     if (window.innerWidth < 1024) {
+      // 1. Ta bort CSS-animationen
+      swipeCard.classList.remove("animate-in");
+
+      // 2. Sätt kortet stelt i mitten
+      swipeCard.style.transition = "none";
+      swipeCard.style.transform = "translateX(0px) rotate(0deg)";
+
+      // 3. Tvinga reflow
+      void swipeCard.offsetWidth;
+
+      // 4. Flyg iväg åt vänster
       swipeCard.style.transition = "transform 0.3s ease";
       swipeCard.style.transform = "translateX(-1000px) rotate(-30deg)";
+
       nextCard(300);
     } else {
       nextCard(0);
