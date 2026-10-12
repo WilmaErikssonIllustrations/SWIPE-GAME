@@ -1,9 +1,35 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const startView = document.getElementById("start-view");
-  const selectView = document.getElementById("select-view");
-  const swipeView = document.getElementById("swipe-view");
+"use strict";
 
-  const playBtn = document.getElementById("play-btn");
+document.addEventListener("DOMContentLoaded", () => {
+  function getRequiredElement(id) {
+    const element = document.getElementById(id);
+
+    if (!element) {
+      throw new Error(`Required element #${id} was not found.`);
+    }
+
+    return element;
+  }
+
+  const startView = getRequiredElement("start-view");
+  const selectView = getRequiredElement("select-view");
+  const swipeView = getRequiredElement("swipe-view");
+  const playBtn = getRequiredElement("play-btn");
+  const swipeCard = getRequiredElement("swipe-card");
+  const cardImg = getRequiredElement("card-img");
+  const swipeText = getRequiredElement("swipe-text");
+  const actionButtons = getRequiredElement("action-buttons");
+  const swipeHint = getRequiredElement("swipe-hint");
+  const stampLike = getRequiredElement("stamp-like");
+  const stampNope = getRequiredElement("stamp-nope");
+  const likeBtn = getRequiredElement("like-btn");
+  const rejectBtn = getRequiredElement("reject-btn");
+  const petCards = document.querySelectorAll(".pet-card");
+  const swipeThreshold = 100;
+  const swipeDuration = 300;
+  const desktopBreakpoint = 1024;
+  const offscreenDistance = 1000;
+  const exitRotation = 30;
 
   const profiles = {
     active: {
@@ -151,55 +177,61 @@ document.addEventListener("DOMContentLoaded", () => {
     },
   ];
 
-  let currentCards = [];
-  let currentCardIndex = 0;
-
-  let scores = {
+  const scores = {
     active: 0,
     "not active": 0,
     tricks: 0,
   };
 
-  const swipeCard = document.getElementById("swipe-card");
-  const cardImg = document.getElementById("card-img");
-  const swipeText = document.getElementById("swipe-text");
-  const actionButtons = document.getElementById("action-buttons");
-  const swipeHint = document.getElementById("swipe-hint");
-  const stampLike = document.getElementById("stamp-like");
-  const stampNope = document.getElementById("stamp-nope");
+  let currentCards = [];
+  let currentCardIndex = 0;
+  let startX = 0;
+  let currentX = 0;
+  let isDragging = false;
+
   function triggerCardAnimation() {
     swipeCard.classList.remove("animate-in");
-    void swipeCard.offsetWidth; // Triggar omflyttning (reflow) för att starta om animationen
+    void swipeCard.offsetWidth;
     swipeCard.classList.add("animate-in");
   }
 
-  // Hjälpfunktion för att blanda en array slumpmässigt
   function shuffleArray(array) {
-    return [...array].sort(() => Math.random() - 0.5);
+    const shuffled = [...array];
+
+    for (let index = shuffled.length - 1; index > 0; index--) {
+      const randomIndex = Math.floor(Math.random() * (index + 1));
+      [shuffled[index], shuffled[randomIndex]] = [
+        shuffled[randomIndex],
+        shuffled[index],
+      ];
+    }
+
+    return shuffled;
   }
 
-  // Återställ poängen vid ny spelomgång
   function resetScores() {
-    scores.active = 0;
-    scores["not active"] = 0;
-    scores.tricks = 0;
+    for (const category of Object.keys(scores)) {
+      scores[category] = 0;
+    }
   }
 
-  // Förladda ALLA bilder i minnet direkt vid start
   function preloadAllImages() {
     const allCards = [...dogCards, ...catCards];
     const extraImages = ["assets/cat2.webp", "assets/dog.webp"];
 
-    [...allCards.map((c) => c.img), ...extraImages].forEach((src) => {
+    const imageSources = new Set([
+      ...allCards.map(({ img }) => img),
+      ...extraImages,
+    ]);
+
+    imageSources.forEach((src) => {
       const img = new Image();
       img.src = src;
     });
   }
 
-  // Kör förladdningen direkt när sidan laddas
   preloadAllImages();
 
-  // Uppdaterar innehållet på kortet eller visar resultatet
   function updateCardContent() {
     resetStamps();
     if (currentCardIndex < currentCards.length) {
@@ -211,13 +243,12 @@ document.addEventListener("DOMContentLoaded", () => {
       swipeText.textContent = currentCards[currentCardIndex].text;
 
       // Visa hand-emojin (swipe hint) endast på allra första kortet
-      if (currentCardIndex === 0 && swipeHint) {
+      if (currentCardIndex === 0) {
         swipeHint.classList.remove("hidden");
-        // Starta om animationen ifall spelet startats om
         swipeHint.style.animation = "none";
-        void swipeHint.offsetWidth; // trigga reflow
+        void swipeHint.offsetWidth;
         swipeHint.style.animation = "swipePrompt 3.0s ease-in-out forwards";
-      } else if (swipeHint) {
+      } else {
         swipeHint.classList.add("hidden");
       }
 
@@ -227,55 +258,49 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Räkna ut vilken kategori som fick flest "Ja" och visa resultatet
   function showResult() {
-    // Dölj swipe-hint om den fortfarande syns av någon anledning
-    if (swipeHint) swipeHint.classList.add("hidden");
+    swipeHint.classList.add("hidden");
     resetStamps();
-    let winningCategory = "not active";
-    let highestScore = -1;
-
-    for (const [category, count] of Object.entries(scores)) {
-      if (count > highestScore) {
-        highestScore = count;
-        winningCategory = category;
-      }
-    }
-
+    const [winningCategory] = Object.entries(scores).reduce((winner, entry) =>
+      entry[1] > winner[1] ? entry : winner,
+    );
     const result = profiles[winningCategory];
 
-    // Visa bilden för den vinnande profilen istället för att dölja den helt!
     cardImg.style.display = "block";
     cardImg.src = result.img;
 
     actionButtons.style.display = "none";
     swipeCard.classList.add("result-mode");
+    swipeText.replaceChildren();
 
-    // Sätt texten och lägg till en "Spela igen"-knapp direkt i texten eller under
-    swipeText.innerHTML = `
-      <strong>Din profil: ${result.title}</strong><br><br>
-      ${result.description}<br><br>
-      <button id="restart-btn" class="play-btn" style="margin: 12px auto 0 auto; width: 110px; height: 40px; font-size: 14px;">Spela igen</button>
-    `;
+    const resultTitle = document.createElement("strong");
+    resultTitle.textContent = `Din profil: ${result.title}`;
+
+    const resultDescription = document.createElement("span");
+    resultDescription.textContent = result.description;
+
+    const restartButton = document.createElement("button");
+    restartButton.id = "restart-btn";
+    restartButton.className = "play-btn restart-btn";
+    restartButton.type = "button";
+    restartButton.textContent = "Spela igen";
+
+    swipeText.append(resultTitle, resultDescription, restartButton);
 
     triggerCardAnimation();
 
-    // Koppla funktion till starta om-knappen
-    document.getElementById("restart-btn")?.addEventListener("click", () => {
+    restartButton.addEventListener("click", () => {
       swipeCard.classList.remove("result-mode");
       swipeView.classList.add("hidden");
-      startView.classList.remove("hidden"); // Skickar tillbaka till startvyn
+      startView.classList.remove("hidden");
     });
   }
 
-  // Gå från startsida till djurval
   playBtn.addEventListener("click", () => {
     startView.classList.add("hidden");
     selectView.classList.remove("hidden");
   });
 
-  // Klicka på djurkort (Hund eller Katt)
-  const petCards = document.querySelectorAll(".pet-card");
   petCards.forEach((card) => {
     card.addEventListener("click", () => {
       const selectedPet = card.getAttribute("data-pet");
@@ -295,30 +320,29 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // --- KONTROLLERA OM SWIPE SKA TILLÅTAS ---
   const isSwipeAllowed = () => {
     const isTouch =
       "ontouchstart" in window ||
       navigator.maxTouchPoints > 0 ||
       window.matchMedia("(pointer: coarse)").matches;
 
-    const isSmallerThanLaptop = window.innerWidth < 1024;
-
-    return isTouch && isSmallerThanLaptop;
+    return isTouch && window.innerWidth < desktopBreakpoint;
   };
 
-  let startX = 0;
-  let currentX = 0;
-  let isDragging = false;
+  function animateCardOut(isLike) {
+    const direction = isLike ? 1 : -1;
+    swipeCard.style.transition = `transform ${swipeDuration / 1000}s ease`;
+    swipeCard.style.transform = `translateX(${direction * offscreenDistance}px) rotate(${direction * exitRotation}deg)`;
+  }
 
   swipeCard.addEventListener("touchstart", (e) => {
     if (!isSwipeAllowed() || currentCardIndex >= currentCards.length) return;
 
-    // Om användaren rör kortet, avbryt hinthanden direkt
-    if (swipeHint) swipeHint.classList.add("hidden");
+    swipeHint.classList.add("hidden");
 
     isDragging = true;
     startX = e.touches[0].clientX;
+    currentX = 0;
     swipeCard.style.transition = "none";
     swipeCard.classList.remove("animate-in");
   });
@@ -328,15 +352,14 @@ document.addEventListener("DOMContentLoaded", () => {
     currentX = e.touches[0].clientX - startX;
     const rotate = currentX * 0.1;
     swipeCard.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
-    // NYTT: Beräkna hur stark stämpeln (hjärta/kryss) ska synas (0 till 1)
-    const opacity = Math.min(Math.abs(currentX) / 100, 1);
+    const opacity = Math.min(Math.abs(currentX) / swipeThreshold, 1);
 
     if (currentX > 0) {
-      if (stampLike) stampLike.style.opacity = opacity;
-      if (stampNope) stampNope.style.opacity = 0;
+      stampLike.style.opacity = opacity;
+      stampNope.style.opacity = 0;
     } else {
-      if (stampNope) stampNope.style.opacity = opacity;
-      if (stampLike) stampLike.style.opacity = 0;
+      stampNope.style.opacity = opacity;
+      stampLike.style.opacity = 0;
     }
   });
 
@@ -344,106 +367,77 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!isDragging || !isSwipeAllowed()) return;
     isDragging = false;
 
-    swipeCard.style.transition = "transform 0.3s ease";
-
-    if (currentX > 100) {
-      swipeCard.style.transform = "translateX(1000px) rotate(30deg)";
-      if (stampLike) stampLike.style.opacity = 1;
-      registerChoice(true);
-      nextCard(300);
-    } else if (currentX < -100) {
-      swipeCard.style.transform = "translateX(-1000px) rotate(-30deg)";
-      if (stampNope) stampNope.style.opacity = 1;
-      registerChoice(false);
-      nextCard(300);
+    if (Math.abs(currentX) > swipeThreshold) {
+      const isLike = currentX > 0;
+      animateCardOut(isLike);
+      (isLike ? stampLike : stampNope).style.opacity = 1;
+      registerChoice(isLike);
+      nextCard(swipeDuration);
     } else {
+      swipeCard.style.transition = `transform ${swipeDuration / 1000}s ease`;
       swipeCard.style.transform = "translateX(0px) rotate(0deg)";
       resetStamps();
     }
   });
 
+  window.addEventListener("touchcancel", () => {
+    if (!isDragging) return;
+
+    isDragging = false;
+    currentX = 0;
+    swipeCard.style.transition = `transform ${swipeDuration / 1000}s ease`;
+    swipeCard.style.transform = "translateX(0px) rotate(0deg)";
+    resetStamps();
+  });
+
   function registerChoice(isLike) {
-    if (isLike && currentCardIndex < currentCards.length) {
-      const currentCategory = currentCards[currentCardIndex].category;
-      if (scores[currentCategory] !== undefined) {
-        scores[currentCategory]++;
-      }
+    if (!isLike || currentCardIndex >= currentCards.length) return;
+
+    const category = currentCards[currentCardIndex].category;
+    if (Object.hasOwn(scores, category)) {
+      scores[category]++;
     }
   }
 
   function resetStamps() {
-    if (stampLike) stampLike.style.opacity = 0;
-    if (stampNope) stampNope.style.opacity = 0;
+    stampLike.style.opacity = 0;
+    stampNope.style.opacity = 0;
   }
 
-  // Går till nästa kort
   function nextCard(delay = 0) {
-    if (delay === 0) {
+    const advance = () => {
       currentCardIndex++;
       swipeCard.style.transition = "none";
       swipeCard.style.transform = "translateX(0px) rotate(0deg)";
       currentX = 0;
       updateCardContent();
-    } else {
-      setTimeout(() => {
-        currentCardIndex++;
-        swipeCard.style.transition = "none";
-        swipeCard.style.transform = "translateX(0px) rotate(0deg)";
-        currentX = 0;
-        updateCardContent();
-      }, delay);
+    };
+
+    if (delay > 0) {
+      window.setTimeout(advance, delay);
+      return;
     }
+
+    advance();
   }
 
-  // Klicka på Hjärta (Ja)
-  document.getElementById("like-btn")?.addEventListener("click", () => {
-    if (swipeHint) swipeHint.classList.add("hidden");
-    registerChoice(true);
+  function handleButtonChoice(isLike) {
+    swipeHint.classList.add("hidden");
+    registerChoice(isLike);
 
-    if (window.innerWidth < 1024) {
-      // 1. Ta bort CSS-animationen
+    if (window.innerWidth < desktopBreakpoint) {
       swipeCard.classList.remove("animate-in");
-
-      // 2. Sätt kortet stelt i mitten (detta blir startpunkten för att flyga iväg)
       swipeCard.style.transition = "none";
       swipeCard.style.transform = "translateX(0px) rotate(0deg)";
-
-      // 3. TVINGA webbläsaren att registrera startpunkten (viktigt hack!)
       void swipeCard.offsetWidth;
-
-      // 4. Nu kan vi be den flyga iväg med en mjuk övergång
-      swipeCard.style.transition = "transform 0.3s ease";
-      swipeCard.style.transform = "translateX(1000px) rotate(30deg)";
-
-      nextCard(300);
-    } else {
-      nextCard(0);
+      animateCardOut(isLike);
+      nextCard(swipeDuration);
+      return;
     }
-  });
 
-  // Klicka på Kryss (Nej)
-  document.getElementById("reject-btn")?.addEventListener("click", () => {
-    if (swipeHint) swipeHint.classList.add("hidden");
-    registerChoice(false);
+    nextCard();
+  }
 
-    if (window.innerWidth < 1024) {
-      // 1. Ta bort CSS-animationen
-      swipeCard.classList.remove("animate-in");
-
-      // 2. Sätt kortet stelt i mitten
-      swipeCard.style.transition = "none";
-      swipeCard.style.transform = "translateX(0px) rotate(0deg)";
-
-      // 3. Tvinga reflow
-      void swipeCard.offsetWidth;
-
-      // 4. Flyg iväg åt vänster
-      swipeCard.style.transition = "transform 0.3s ease";
-      swipeCard.style.transform = "translateX(-1000px) rotate(-30deg)";
-
-      nextCard(300);
-    } else {
-      nextCard(0);
-    }
-  });
+  likeBtn.addEventListener("click", () => handleButtonChoice(true));
+  rejectBtn.addEventListener("click", () => handleButtonChoice(false));
 });

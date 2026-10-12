@@ -31,14 +31,14 @@
       <h2 class="handwritten-title">välj ditt husdjur</h2>
 
       <div class="pet-options">
-        <button class="pet-card" data-pet="katt">
+        <button class="pet-card" type="button" data-pet="katt">
           <div class="image-wrapper">
             <img src="assets/cat2.webp" alt="Katt" />
           </div>
           <span class="pet-label">katt</span>
         </button>
 
-        <button class="pet-card" data-pet="hund">
+        <button class="pet-card" type="button" data-pet="hund">
           <div class="image-wrapper">
             <img src="assets/dog.webp" alt="Hund" />
           </div>
@@ -52,7 +52,7 @@
       <div class="swipe-card animate-in" id="swipe-card">
         <div class="swipe-hint hidden" id="swipe-hint">👆</div>
         <div class="stamp stamp-like" id="stamp-like">
-          <svg viewBox="0 0 24 24" width="80" height="80" fill="#fd5068">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="80" height="80" fill="#fd5068">
             <path
               d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
             />
@@ -60,6 +60,7 @@
         </div>
         <div class="stamp stamp-nope" id="stamp-nope">
           <svg
+            aria-hidden="true"
             viewBox="0 0 24 24"
             width="80"
             height="80"
@@ -74,12 +75,18 @@
           </svg>
         </div>
         <img id="card-img" src="" alt="Djurillustration" />
-        <p class="swipe-text" id="swipe-text"></p>
+        <div class="swipe-text" id="swipe-text"></div>
       </div>
 
       <div class="action-buttons" id="action-buttons">
-        <button class="action-btn reject-btn" id="reject-btn" aria-label="Nej">
+        <button
+          class="action-btn reject-btn"
+          id="reject-btn"
+          type="button"
+          aria-label="Nej"
+        >
           <svg
+            aria-hidden="true"
             viewBox="0 0 24 24"
             width="28"
             height="28"
@@ -94,8 +101,13 @@
           </svg>
         </button>
 
-        <button class="action-btn like-btn" id="like-btn" aria-label="Ja">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="#fd5068">
+        <button
+          class="action-btn like-btn"
+          id="like-btn"
+          type="button"
+          aria-label="Ja"
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="28" height="28" fill="#fd5068">
             <path
               d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
             />
