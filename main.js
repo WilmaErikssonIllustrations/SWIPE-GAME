@@ -24,12 +24,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const stampNope = getRequiredElement("stamp-nope");
   const likeBtn = getRequiredElement("like-btn");
   const rejectBtn = getRequiredElement("reject-btn");
+  const deckGhosts = [
+    getRequiredElement("deck-ghost-1"),
+    getRequiredElement("deck-ghost-2"),
+  ];
   const petCards = document.querySelectorAll(".pet-card");
   const swipeThreshold = 100;
   const swipeDuration = 300;
   const desktopBreakpoint = 1024;
   const offscreenDistance = 1000;
   const exitRotation = 30;
+  const deckExitDuration = 420;
+  const deckAdvanceDuration = 350;
+  const deckExitRotation = 26;
+  const deckStepY = 14;
+  const deckStepScale = 0.05;
 
   const profiles = {
     active: {
@@ -188,6 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let startX = 0;
   let currentX = 0;
   let isDragging = false;
+  let isDeckAnimating = false;
 
   function triggerCardAnimation() {
     swipeCard.classList.remove("animate-in");
@@ -232,8 +242,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
   preloadAllImages();
 
+  function deckTransform(position) {
+    return `translateY(${position * deckStepY}px) scale(${1 - position * deckStepScale})`;
+  }
+
+  // Ställer tillbaka korten bakom och döljer dem som inte behövs mot slutet av leken
+  function resetDeck() {
+    const cardsLeft = currentCards.length - currentCardIndex - 1;
+
+    deckGhosts.forEach((ghost, index) => {
+      ghost.style.transition = "none";
+      ghost.style.transform = "";
+      ghost.classList.toggle("is-empty", index >= cardsLeft);
+    });
+  }
+
   function updateCardContent() {
     resetStamps();
+    resetDeck();
     if (currentCardIndex < currentCards.length) {
       swipeCard.classList.remove("result-mode");
       cardImg.style.display = "block";
@@ -421,21 +447,46 @@ document.addEventListener("DOMContentLoaded", () => {
     advance();
   }
 
+  // Desktop: kortet kastas ut åt sidan medan korten bakom flyttar fram ett steg
+  function animateDeckCardOut(isLike) {
+    const direction = isLike ? 1 : -1;
+    const distance = window.innerWidth + 420;
+
+    isDeckAnimating = true;
+    (isLike ? stampLike : stampNope).style.opacity = 1;
+
+    swipeCard.classList.remove("animate-in");
+    swipeCard.style.transition = `transform ${deckExitDuration / 1000}s cubic-bezier(0.3, 0.6, 0.4, 1)`;
+    swipeCard.style.transform = `translateX(${direction * distance}px) rotate(${direction * deckExitRotation}deg)`;
+
+    deckGhosts.forEach((ghost, index) => {
+      ghost.style.transition = `transform ${deckAdvanceDuration / 1000}s ease`;
+      ghost.style.transform = deckTransform(index);
+    });
+
+    window.setTimeout(() => {
+      isDeckAnimating = false;
+      nextCard();
+    }, deckAdvanceDuration + 10);
+  }
+
   function handleButtonChoice(isLike) {
+    if (isDeckAnimating) return;
+
     swipeHint.classList.add("hidden");
     registerChoice(isLike);
 
-    if (window.innerWidth < desktopBreakpoint) {
-      swipeCard.classList.remove("animate-in");
-      swipeCard.style.transition = "none";
-      swipeCard.style.transform = "translateX(0px) rotate(0deg)";
-      void swipeCard.offsetWidth;
-      animateCardOut(isLike);
-      nextCard(swipeDuration);
+    if (window.innerWidth >= desktopBreakpoint) {
+      animateDeckCardOut(isLike);
       return;
     }
 
-    nextCard();
+    swipeCard.classList.remove("animate-in");
+    swipeCard.style.transition = "none";
+    swipeCard.style.transform = "translateX(0px) rotate(0deg)";
+    void swipeCard.offsetWidth;
+    animateCardOut(isLike);
+    nextCard(swipeDuration);
   }
 
   likeBtn.addEventListener("click", () => handleButtonChoice(true));

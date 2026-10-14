@@ -427,3 +427,122 @@ button,
   right: 20px;
   transform: rotate(15deg);
 }
+
+/* --- KORTLEK (ENDAST DESKTOP) --- */
+
+/* På mobil påverkar kortleken inte layouten alls */
+.deck {
+  display: contents;
+}
+
+.deck-ghost {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .deck {
+    --deck-shadow: 0 30px 60px -30px rgba(44, 43, 44, 0.55);
+    position: relative;
+    display: block;
+    width: 400px;
+    height: 490px;
+  }
+
+  /* Slutsidan ska se ut precis som förut */
+  .deck:has(> .swipe-card.result-mode) {
+    display: contents;
+  }
+
+  .deck:has(> .swipe-card.result-mode) .deck-ghost {
+    display: none;
+  }
+
+  /* Korten bakom: lite lägre och mindre, skalade från underkanten */
+  .deck-ghost,
+  .swipe-card:not(.result-mode) {
+    position: absolute;
+    inset: 0;
+    border-radius: 36px;
+    transform-origin: 50% 100%;
+    box-shadow: var(--deck-shadow);
+  }
+
+  .deck-ghost {
+    display: block;
+    background-color: var(--card-bg);
+    border: 2px solid var(--lighter-2);
+  }
+
+  .deck-ghost-1 {
+    z-index: 9;
+    transform: translateY(14px) scale(0.95);
+  }
+
+  .deck-ghost-2 {
+    z-index: 8;
+    transform: translateY(28px) scale(0.9);
+  }
+
+  .deck-ghost.is-empty {
+    visibility: hidden;
+  }
+
+  .swipe-card:not(.result-mode) {
+    z-index: 10;
+    width: auto;
+    justify-content: flex-start;
+    will-change: transform;
+  }
+
+  /* Bilden fyller det som blir över när texten fått plats */
+  .swipe-card:not(.result-mode) img {
+    flex: 1 1 auto;
+    min-height: 0;
+    aspect-ratio: auto;
+    border-radius: 20px;
+  }
+
+  /* Ingen inzoomning: nästa kort ligger redan i leken */
+  .swipe-card.animate-in:not(.result-mode) {
+    animation: none;
+  }
+
+  /* Runda knappar som sitter på kortets kanter, mitt på höjden */
+  .action-buttons {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  .action-btn {
+    position: absolute;
+    top: 50%;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 16px 34px -14px rgba(44, 43, 44, 0.95);
+    pointer-events: auto;
+    transition:
+      transform 0.15s ease,
+      background-color 0.15s ease;
+  }
+
+  .action-btn svg {
+    width: 31px;
+    height: 31px;
+  }
+
+  .action-btn:active {
+    transform: translateY(-50%) scale(0.92);
+  }
+
+  .reject-btn {
+    left: -60px;
+  }
+
+  .like-btn {
+    right: -60px;
+  }
+}
