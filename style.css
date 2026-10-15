@@ -492,6 +492,11 @@ button,
     width: auto;
     justify-content: flex-start;
     will-change: transform;
+    cursor: grab;
+  }
+
+  .swipe-card.is-dragging {
+    cursor: grabbing;
   }
 
   /* Bilden fyller det som blir över när texten fått plats */
@@ -544,5 +549,120 @@ button,
 
   .like-btn {
     right: -60px;
+  }
+}
+
+/* --- RESULTAT VID LIKA POÄNG --- */
+
+.tie-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-height: 100%;
+  padding: 12px; /* Plats för kortens skugga inuti skrollytan */
+  overflow-y: auto;
+  touch-action: pan-y; /* Går att skrolla om korten inte får plats */
+  animation: cardEnter 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.tie-title {
+  font-family: "Caveat", cursive, sans-serif;
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.1;
+  text-align: center;
+  color: var(--main);
+}
+
+.tie-subtitle {
+  display: block;
+  margin-top: 4px;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.tie-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.tie-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--card-bg);
+  border: 2px solid var(--lighter-2);
+  border-radius: 20px;
+  padding: 12px;
+  box-shadow: var(--card-shadow);
+}
+
+.tie-card img {
+  flex: 0 0 96px;
+  width: 96px;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.tie-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: "Caveat", cursive, sans-serif;
+  font-size: 18px;
+  line-height: 1.15;
+  color: var(--main);
+}
+
+.tie-card-text strong {
+  font-size: 24px;
+}
+
+@media (min-width: 768px) {
+  .tie-result {
+    width: min(720px, calc(100vw - 64px));
+    gap: 24px;
+  }
+
+  .tie-title {
+    font-size: 40px;
+  }
+
+  .tie-subtitle {
+    font-size: 26px;
+  }
+
+  /* Korten bredvid varandra på större skärmar */
+  .tie-cards {
+    flex-direction: row;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .tie-card {
+    flex: 1 1 0;
+    max-width: 320px;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px;
+  }
+
+  .tie-card img {
+    flex: none;
+    width: 100%;
+  }
+
+  .tie-card-text {
+    text-align: center;
+    font-size: 20px;
+  }
+
+  .tie-card-text strong {
+    font-size: 28px;
   }
 }

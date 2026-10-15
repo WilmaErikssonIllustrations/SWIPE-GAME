@@ -24,6 +24,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const stampNope = getRequiredElement("stamp-nope");
   const likeBtn = getRequiredElement("like-btn");
   const rejectBtn = getRequiredElement("reject-btn");
+  const deck = getRequiredElement("deck");
+  const tieResult = getRequiredElement("tie-result");
+  const tieHeading = getRequiredElement("tie-heading");
+  const tieSubtitle = getRequiredElement("tie-subtitle");
+  const tieCards = getRequiredElement("tie-cards");
+  const tieRestartBtn = getRequiredElement("tie-restart-btn");
   const deckGhosts = [
     getRequiredElement("deck-ghost-1"),
     getRequiredElement("deck-ghost-2"),
@@ -77,11 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
     {
       img: "assets/long-walk.webp",
       text: "långa promenader i naturen är min bästa återhämtning",
-      category: "active",
-    },
-    {
-      img: "assets/energetic-dog.webp",
-      text: "min hund är en riktig energikick precis som jag",
       category: "active",
     },
 
@@ -287,10 +288,32 @@ document.addEventListener("DOMContentLoaded", () => {
   function showResult() {
     swipeHint.classList.add("hidden");
     resetStamps();
-    const [winningCategory] = Object.entries(scores).reduce((winner, entry) =>
-      entry[1] > winner[1] ? entry : winner,
+    // Andel gillade kort per kategori, så att kategorier med fler kort inte vinner oftare
+    const likedShares = Object.fromEntries(
+      Object.keys(scores).map((category) => {
+        const cardCount = currentCards.filter(
+          (card) => card.category === category,
+        ).length;
+        return [category, cardCount > 0 ? scores[category] / cardCount : 0];
+      }),
     );
-    const result = profiles[winningCategory];
+    const topShare = Math.max(...Object.values(likedShares));
+
+    if (topShare === 0) {
+      showNoLikesResult();
+      return;
+    }
+
+    const winningCategories = Object.keys(likedShares).filter(
+      (category) => Math.abs(likedShares[category] - topShare) < 1e-9,
+    );
+
+    if (winningCategories.length > 1) {
+      showTieResult(winningCategories);
+      return;
+    }
+
+    const result = profiles[winningCategories[0]];
 
     cardImg.style.display = "block";
     cardImg.src = result.img;
@@ -321,6 +344,59 @@ document.addEventListener("DOMContentLoaded", () => {
       startView.classList.remove("hidden");
     });
   }
+
+  // Lika poäng: visa alla profiler som delar förstaplatsen
+  function showTieResult(categories) {
+    const cards = categories.map((category) => {
+      const profile = profiles[category];
+
+      const card = document.createElement("article");
+      card.className = "tie-card";
+
+      const img = document.createElement("img");
+      img.src = profile.img;
+      img.alt = profile.title;
+
+      const text = document.createElement("div");
+      text.className = "tie-card-text";
+
+      const title = document.createElement("strong");
+      title.textContent = profile.title;
+
+      const description = document.createElement("span");
+      description.textContent = profile.description;
+
+      text.append(title, description);
+      card.append(img, text);
+      return card;
+    });
+
+    showMessageResult(
+      "Du har många sidor!",
+      "Du fick lika många poäng i flera kategorier",
+      cards,
+    );
+  }
+
+  function showNoLikesResult() {
+    showMessageResult("Du gillade inga kort", "testa igen!", []);
+  }
+
+  function showMessageResult(heading, subtitle, cards) {
+    tieHeading.textContent = heading;
+    tieSubtitle.textContent = subtitle;
+    tieCards.replaceChildren(...cards);
+    tieCards.classList.toggle("hidden", cards.length === 0);
+    deck.classList.add("hidden");
+    tieResult.classList.remove("hidden");
+  }
+
+  tieRestartBtn.addEventListener("click", () => {
+    tieResult.classList.add("hidden");
+    deck.classList.remove("hidden");
+    swipeView.classList.add("hidden");
+    startView.classList.remove("hidden");
+  });
 
   playBtn.addEventListener("click", () => {
     startView.classList.add("hidden");
@@ -378,15 +454,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentX = e.touches[0].clientX - startX;
     const rotate = currentX * 0.1;
     swipeCard.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
-    const opacity = Math.min(Math.abs(currentX) / swipeThreshold, 1);
-
-    if (currentX > 0) {
-      stampLike.style.opacity = opacity;
-      stampNope.style.opacity = 0;
-    } else {
-      stampNope.style.opacity = opacity;
-      stampLike.style.opacity = 0;
-    }
+    updateStamps(currentX);
   });
 
   window.addEventListener("touchend", () => {
@@ -416,12 +484,88 @@ document.addEventListener("DOMContentLoaded", () => {
     resetStamps();
   });
 
+  // --- DRA MED MUSEN (ENDAST DESKTOP) ---
+  const mouseDragRotation = 0.06;
+  const mouseDragLiftY = 0.25;
+  let mouseStartY = 0;
+  let mouseOffsetY = 0;
+  let isMouseDragging = false;
+
+  const isMouseSwipeAllowed = (e) =>
+    e.pointerType === "mouse" &&
+    e.button === 0 &&
+    window.innerWidth >= desktopBreakpoint &&
+    currentCardIndex < currentCards.length &&
+    !isDeckAnimating;
+
+  // Hindrar webbläsarens egen bild-drag
+  swipeCard.addEventListener("dragstart", (e) => e.preventDefault());
+
+  swipeCard.addEventListener("pointerdown", (e) => {
+    if (!isMouseSwipeAllowed(e)) return;
+
+    isMouseDragging = true;
+    startX = e.clientX;
+    mouseStartY = e.clientY;
+    currentX = 0;
+    mouseOffsetY = 0;
+    swipeCard.setPointerCapture(e.pointerId);
+    swipeCard.style.transition = "none";
+    swipeCard.classList.remove("animate-in");
+    swipeCard.classList.add("is-dragging");
+  });
+
+  swipeCard.addEventListener("pointermove", (e) => {
+    if (!isMouseDragging) return;
+
+    currentX = e.clientX - startX;
+    mouseOffsetY = (e.clientY - mouseStartY) * mouseDragLiftY;
+    swipeCard.style.transform = `translate(${currentX}px, ${mouseOffsetY}px) rotate(${currentX * mouseDragRotation}deg)`;
+    updateStamps(currentX);
+  });
+
+  function endMouseDrag(isCancelled) {
+    if (!isMouseDragging) return;
+
+    isMouseDragging = false;
+    swipeCard.classList.remove("is-dragging");
+
+    if (!isCancelled && Math.abs(currentX) > swipeThreshold) {
+      const isLike = currentX > 0;
+      registerChoice(isLike);
+      animateDeckCardOut(isLike);
+      return;
+    }
+
+    // Inte tillräckligt långt: kortet studsar tillbaka
+    swipeCard.style.transition = "transform 0.35s cubic-bezier(0.3, 1.5, 0.5, 1)";
+    swipeCard.style.transform = "translate(0px, 0px) rotate(0deg)";
+    currentX = 0;
+    resetStamps();
+  }
+
+  swipeCard.addEventListener("pointerup", () => endMouseDrag(false));
+  swipeCard.addEventListener("pointercancel", () => endMouseDrag(true));
+
   function registerChoice(isLike) {
     if (!isLike || currentCardIndex >= currentCards.length) return;
 
     const category = currentCards[currentCardIndex].category;
     if (Object.hasOwn(scores, category)) {
       scores[category]++;
+    }
+  }
+
+  // Stämpeln tonas in i takt med hur långt kortet dragits
+  function updateStamps(dragX) {
+    const opacity = Math.min(Math.abs(dragX) / swipeThreshold, 1);
+
+    if (dragX > 0) {
+      stampLike.style.opacity = opacity;
+      stampNope.style.opacity = 0;
+    } else {
+      stampNope.style.opacity = opacity;
+      stampLike.style.opacity = 0;
     }
   }
 
